@@ -58,6 +58,14 @@ int main() {
 
     }
 
+    int old_n = n;
+
+    if (n != m - 1) {
+        cout << "\nМатрица не является системой уравнений или язвляется переопределённой\n";
+        memoryDel(arr, old_n, m);
+        return 0;
+    }
+
     for (unsigned int i = n - 1; i >= 1; i--) {
         dopStr(arr, n, m, i);
     }
@@ -80,6 +88,8 @@ int main() {
         n--;
     }
     
+    
+
     printing(arr, n, m);
 
     double** arr_copy = new double* [n];
@@ -114,7 +124,8 @@ int main() {
 
     reverseMatr(arr_copy, n, m, c_r);
 
-    memoryDel(arr, n, m);
+    memoryDel(arr, old_n, m);
+    memoryDel(arr_copy, old_n, m);
 
     return 0;
 }
@@ -155,7 +166,7 @@ void memoryDel(double**& arr, int n, int m) {
 
     for (int i = 0; i < n; i++) {
 
-        delete[]arr[i];
+        delete[] arr[i];
 
     }
 
@@ -319,6 +330,8 @@ void reverseMatr(double**& arr, int n, int m, int c_r) {
     cout << "\nОбратная матрица:\n";
 
     printing(reverse, n, m-1);
+
+    memoryDel(reverse, n, m * 2);
 
 
 }
