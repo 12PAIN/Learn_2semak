@@ -1,7 +1,9 @@
-п»ї#include <iostream>
+#include <iostream>
 #include <fstream>
-#include <math.h>
 #include <iomanip>
+#include <cstdlib>
+#include <time.h>
+#include <math.h>
 
 using namespace std;
 
@@ -16,6 +18,7 @@ int zeroString(double**&, int, int, int);
 void switchStrings(double**&, int, int, int);
 void deltaResults(double**&, double**&, int, int);
 void reverseMatr(double**&, int, int, int);
+bool check(double **&,int,int);
 
 int main() {
 
@@ -30,8 +33,8 @@ int main() {
     double** arr;
 
     if (!fin) {
-        cout << "Р¤Р°Р№Р»Р° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, Р·Р°РїРѕР»РЅСЏСЋ СЃР»СѓС‡Р°Р№РЅРѕ!\n";
-        cout << "Р’РІРµРґРёС‚Рµ СЂР°Р·РјРµСЂРЅРѕСЃС‚СЊ РјР°С‚СЂРёС†С‹-> N=";
+        cout << "Файла не существует, заполняю случайно!\n";
+        cout << "Введите размерность матрицы-> N=";
         cin >> n;
         m = n + 1;
 
@@ -41,7 +44,7 @@ int main() {
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                arr[i][j] = rand() % 100;
+                arr[i][j] = 1./(1+i+j+1);
             }
         }
 
@@ -60,11 +63,11 @@ int main() {
 
     int old_n = n;
 
-    if (n != m - 1) {
-        cout << "\nРњР°С‚СЂРёС†Р° РЅРµ СЏРІР»СЏРµС‚СЃСЏ СЃРёСЃС‚РµРјРѕР№ СѓСЂР°РІРЅРµРЅРёР№ РёР»Рё СЏР·РІР»СЏРµС‚СЃСЏ РїРµСЂРµРѕРїСЂРµРґРµР»С‘РЅРЅРѕР№\n";
+    /*if (n != m - 1) {
+        cout << "\nМатрица не является системой уравнений или является переопределённой\n";
         memoryDel(arr, old_n, m);
         return 0;
-    }
+    }*/
 
     for (unsigned int i = n - 1; i >= 1; i--) {
         dopStr(arr, n, m, i);
@@ -73,11 +76,11 @@ int main() {
     for (unsigned int i = 0; i < n; i++) {
         int pos = zeroString(arr, n, m, i);
         if (pos != -1) {
-            //Р—Р°РјРµРЅСЏРµРј РЅСѓР»РµРІСѓСЋ СЃС‚СЂРѕРєСѓ
+            //Заменяем нулевую строку
             for (unsigned int l = 0; l < m; l++) {
                 arr[pos][l] = arr[n - 1][l];
             }
-            //Р—Р°РЅСѓР»СЏРµРј РєСЂР°Р№РЅСЋСЋ СЃС‚СЂРѕРєСѓ
+            //Зануляем крайнюю строку
             for (unsigned int l = 0; l < m; l++) {
                 arr[n - 1][l] = 0;
             }
@@ -87,8 +90,8 @@ int main() {
     while (zeroString(arr, n, m, n - 1) != -1) {
         n--;
     }
-    
-    
+
+
 
     printing(arr, n, m);
 
@@ -100,11 +103,37 @@ int main() {
             arr_copy[i][j] = arr[i][j];
 
 
-    cout << "РџСЂРёРІРѕРґРёРј РјР°С‚СЂРёС†Сѓ Рє С‚СЂРµСѓРіРѕР»СЊРЅРѕРјСѓ РІРёРґСѓ:\n";
+    cout << "Приводим матрицу к треугольному виду:\n";
 
 
 
     triangMatr(arr, n, m, c_r);
+
+    for (unsigned int i = n - 1; i >= 1; i--) {
+        dopStr(arr, n, m, i);
+    }
+
+    cout << "\nУдаляем занулившиеся строки(если есть) ->\n";
+
+    for (unsigned int i = 0; i < n; i++) {
+        int pos = zeroString(arr, n, m, i);
+        if (pos != -1) {
+            //Заменяем нулевую строку
+            for (unsigned int l = 0; l < m; l++) {
+                arr[pos][l] = arr[n - 1][l];
+            }
+            //Зануляем крайнюю строку
+            for (unsigned int l = 0; l < m; l++) {
+                arr[n - 1][l] = 0;
+            }
+            n--;
+        }
+    }
+    while (zeroString(arr, n, m, n - 1) != -1) {
+        n--;
+    }
+
+    printing(arr,n,m);
 
     if (n+1 == m) {
 
@@ -116,11 +145,11 @@ int main() {
     }
     else {
 
-        cout << "\nРўР°Рє РєР°Рє РјР°С‚СЂРёС†Р° РЅРµ РєРІР°РґСЂР°С‚РЅР°СЏ, С‚Рѕ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ РѕРїСЂРµРґРµР»РёС‚РµР»СЏ, Р° X-С‹ РјРѕРіСѓС‚ Р±С‹С‚СЊ РІС‹СЂР°Р¶РµРЅС‹ С‚РѕР»СЊРєРѕ С‡РµСЂРµР· СЃРІРѕР±РѕРґРЅС‹Рµ РєРѕСЌС„РёС†РёРµРЅС‚С‹.\n";
+        cout << "\nТак как матрица не квадратная, то не существует определителя, а X-ы могут быть выражены только через свободные коэфициенты.\n";
 
     }
 
-    cout << "\nРћР±СЂР°С‚РЅР°СЏ РјР°С‚СЂРёС†Р°:\n";
+    cout << "\nОбратная матрица:\n";
 
     reverseMatr(arr_copy, n, m, c_r);
 
@@ -133,7 +162,7 @@ int main() {
 bool dopStr(double**& arr, int n, int m, int k) {
     for (int i = 0; i < k; i++) {
         bool doppel = true;
-        for (unsigned int j = 0; j < m - 1; j++) {
+        for (unsigned int j = 0; j < m; j++) {
             if (arr[i][j] != arr[k][j]) doppel = false;
         }
         if (doppel == true) {
@@ -146,7 +175,7 @@ bool dopStr(double**& arr, int n, int m, int k) {
 }
 
 int zeroString(double**& arr, int n, int m, int k) {
-    for (unsigned int i = 0; i < m - 1; i++) {
+    for (unsigned int i = 0; i < m; i++) {
         if (arr[k][i] != 0) return -1;
     }
     return k;
@@ -161,6 +190,19 @@ void memory(double**& arr, int n, int m) {
     }
 
 };
+
+bool check(double**& arr, int n, int m){
+
+    for(int i = 1; i < n; i++){
+
+        for(int j = 0; j < i; j++){
+            if(arr[i][j] != 0) return 0;
+        }
+
+    }
+
+    return 1;
+}
 
 void memoryDel(double**& arr, int n, int m) {
 
@@ -191,7 +233,7 @@ void printing(double**& arr, int n, int m) {
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
-            cout << setw(5) << (int)arr[i][j] << " ";
+            cout << setw(5) << arr[i][j] << " ";
         }
         cout << endl;
     }
@@ -209,14 +251,27 @@ void triangMatr(double**& arr, int n, int m, int & count_replace) {
             count_replace++;
         }
         koef = -1 * arr[i][k] / arr[k][k];
-        for (unsigned int j = k; j < n + 1; j++) arr[i][j] = arr[i][j] + arr[k][j] * koef;
+
+        for (unsigned int j = k; j < n + 1; j++){
+
+
+                if(check(arr,n,m) == 1) break;
+
+                arr[i][j] = arr[i][j] + arr[k][j] * koef;
+
+
+
+        };
+
+
+
     }
     printing(arr, n, m);
 }
 
 void switchStrings(double**& arr, int n, int m, int k) {
     double* buf = new double[m];
-    //РќР°С…РѕР¶РґРµРЅРёРµ СЃС‚СЂРѕРєРё СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Рј РїРѕ РјРѕРґСѓР»СЋ СЌР»РµРјРµРЅС‚РѕРј
+    //Нахождение строки с максимальным по модулю элементом
     int pos = k + 1;
     double max = 0;
     if (n - k > 1) {
@@ -228,16 +283,16 @@ void switchStrings(double**& arr, int n, int m, int k) {
             }
         }
     }
-    //РџРµСЂРµРјРµС‰РµРЅРёРµ СЃС‚СЂРѕРє
-    //Р‘СѓС„РµСЂ
+    //Перемещение строк
+    //Буфер
     for (unsigned int l = 0; l < m; l++) {
         buf[l] = arr[k][l];
     }
-    //Р—Р°РјРµРЅСЏРµРј k-С‚СѓСЋ СЃС‚СЂРѕРєСѓ
+    //Заменяем k-тую строку
     for (unsigned int l = 0; l < m; l++) {
         arr[k][l] = arr[pos][l];
     }
-    //Р—Р°РјРµРЅСЏРµРј С†РµР»РµРІСѓСЋ СЃС‚СЂРѕРєСѓ
+    //Заменяем целевую строку
     for (unsigned int l = 0; l < m; l++) {
         arr[pos][l] = buf[l];
     }
@@ -259,7 +314,7 @@ void deltaResults(double**& arr, double**& arr_copy, int n, int m) {
         x[i] = res / arr[i][i];
     }
 
-    cout << "Р РµС€РµРЅРёРµ:\n";
+    cout << "Решение:\n";
 
 
     for (int i = 0; i < n; i++) {
@@ -270,8 +325,8 @@ void deltaResults(double**& arr, double**& arr_copy, int n, int m) {
 
     double* y = new double[n];
 
-    cout << "\n\nРћР±СЂР°С‚РЅС‹Рµ СЂРµР·СѓР»СЊС‚Р°С‚С‹ РїРѕСЃР»РµРґРЅРµРіРѕ СЃС‚РѕР»Р±С†Р°: ";
-    
+    cout << "\n\nОбратные результаты последнего столбца: ";
+
     for (unsigned int i = 0; i < n; i++) {
         double res = 0;
         for (unsigned int j = 0; j < n; j++) {
@@ -279,7 +334,7 @@ void deltaResults(double**& arr, double**& arr_copy, int n, int m) {
         }
 
         y[i] = res;
-        
+
         cout << y[i] << ", ";
     }
 
@@ -290,11 +345,11 @@ void deltaResults(double**& arr, double**& arr_copy, int n, int m) {
         if (fabs(y[i] - arr_copy[i][m - 1]) > max) max = fabs(y[i] - arr_copy[i][m - 1]);
     }
 
-    cout << "РћС‚РєР»РѕРЅРµРЅРёРµ РґРµР»СЊС‚Р° =" << max << endl;
+    cout << "Отклонение дельта =" << max << endl;
 
     delete[] y;
     delete[] x;
- 
+
 }
 
 void reverseMatr(double**& arr, int n, int m, int c_r) {
@@ -305,7 +360,7 @@ void reverseMatr(double**& arr, int n, int m, int c_r) {
 
     memory(reverse, n, m * 2-2);
 
-    
+
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m-1; j++) {
@@ -318,8 +373,8 @@ void reverseMatr(double**& arr, int n, int m, int c_r) {
             else reverse[i][j] = 0;
 
         }
-        
-        
+
+
 
     }
 
@@ -327,7 +382,7 @@ void reverseMatr(double**& arr, int n, int m, int c_r) {
 
     triangMatr(reverse, n, m*2-2, c_r);
 
-    cout << "\nРћР±СЂР°С‚РЅР°СЏ РјР°С‚СЂРёС†Р°:\n";
+    cout << "\nОбратная матрица:\n";
 
     printing(reverse, n, m-1);
 
@@ -344,12 +399,12 @@ void determ(double**& arr, int n, int m, int count_replace) {
             determ *= arr[i][i];
         }
         determ *= pow(-1, count_replace);
-        cout << "РћРїСЂРµРґРµР»РёС‚РµР»СЊ = " << determ;
+        cout << "Определитель = " << setprecision(5) <<determ;
 
     }
     else {
 
-        cout << "РћРїСЂРµРґРµР»РёС‚РµР»СЏ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, РјР°С‚СЂРёС†Р° РЅРµ РєРІР°РґСЂР°С‚РЅР°СЏ";
+        cout << "Определителя не существует, матрица не квадратная";
 
     }
 
