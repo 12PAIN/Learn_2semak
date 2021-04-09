@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <fstream>
 #include <string>
+#include <cstdlib>
+#include <stdlib.h>
 
 
 using namespace std;
@@ -12,7 +14,7 @@ struct Node {
 	bool availability;
 	float weight;
 
-    struct Node* next;
+	struct Node* next;
 
 };
 
@@ -23,13 +25,14 @@ bool pop_all();
 bool push_forward(string name, int cost, bool availability, float weight);
 bool push_back(string name, int cost, bool availability, float weight);
 void print();
-void peek();
+Node* peek();
 void fileInsert();
+void finding(string index);
 void stackFileCreation();
 
 int main()
 {
- 
+
 	setlocale(LC_ALL, "rus");
 
 	bool exit = 0;
@@ -73,6 +76,16 @@ int main()
 
 		case 3: {
 
+			cout << "\nВведите что искать:\n";
+			string index;
+
+			cin >> index;
+
+			finding(index);
+
+
+
+
 			break;
 		}
 
@@ -81,7 +94,7 @@ int main()
 			pop_all();
 			break;
 		}
-		
+
 		case 0: {
 			exit = 1;
 			break;
@@ -103,13 +116,15 @@ int main()
 			break;
 		}
 
-		
+
 
 	} while (exit != 1);
-	
 
 
-    return 0;
+
+	pop_all();
+
+	return 0;
 }
 
 void print() {
@@ -121,7 +136,7 @@ void print() {
 		cout << "\nКорзина пустая\n" << endl;
 	}
 	else {
-		
+
 		temp = first;
 
 		cout << "\nТекущая корзина: \n";
@@ -136,7 +151,7 @@ void print() {
 			// переходим к следующему узлу стека
 			temp = temp->next;
 		}
-		
+
 	}
 
 };
@@ -151,23 +166,101 @@ bool pop() {
 	}
 	else {
 		// верхнее значение помещаем в temp
-		temp = first; 
+		temp = first;
 
 		// в вершину стека кладем следующий узел сверху
-		first = first->next; 
+		first = first->next;
 
 		// разрушаем связь для удаляемого узла
 		temp->next = NULL;
-
-		cout << "\nТовар " << temp->name << " удален" << endl;
 
 		// освобождаем память верхнего узла
 		free(temp);
 	}
 
 
-    return 1;
+	return 1;
 };
+
+void finding(string index) {
+
+	if (first != NULL) {
+		int index_int;
+		float index_float;
+
+		struct Node* temp;
+		struct Node* temp1;
+		temp1 = first;
+		temp = first;
+
+		index_int = atoi(index.c_str());
+		index_float = atof(index.c_str());
+
+		bool once = 0, check = 0;
+
+		while (temp1 != NULL && temp != NULL) {
+
+
+			if (index == temp1->name || index_float == temp1->weight || index_int == temp1->cost) {
+
+				if (once == 0) {
+					cout << "\nНайденые товары:\n";
+					once = 1;
+				}
+
+				cout << "\nНазвание: " << temp1->name;
+				cout << "\nСтоимость: " << temp1->cost << " рублей";
+				cout << "\nВес: " << temp1->weight << " кг";
+				cout << "\nВ наличии? " << (temp1->availability == true ? "Да" : "Нет");
+				cout << endl;
+
+				if (temp1 != first) {
+					temp->next = temp1->next;
+
+					free(temp1);
+					temp1 = temp->next;
+
+				}
+				else {
+					temp1 = first->next;
+					temp = first->next;
+					pop();
+				}
+
+				cout << "\nТовар удален из корзины\n";
+
+			}
+			else {
+				if (temp1 != NULL && temp != NULL) {
+					if (check == 1) {
+						temp = temp->next;
+					}
+					temp1 = temp1->next;
+					check = 1;
+				}
+
+			}
+
+		}
+
+		if (once == 0) {
+			cout << "\nТаких товаров не найдено\n";
+		}
+		else {
+			cout << "\nТовары, подходящие по критерию поиска удалены\n";
+		}
+
+	}
+	else {
+
+		cout << "\nКорзина пуста\n";
+
+	}
+
+
+
+
+}
 
 bool pop_all() {
 
@@ -181,40 +274,36 @@ bool pop_all() {
 	return 1;
 };
 
-void peek() {
-	
+Node* peek() {
+
 	// проверка на пустой стек
 	if (first == NULL) cout << "\nСтэк пустой" << endl;
 	//Если не пустой
-	else { 
-		cout << "\nВерх корзины:";
-		cout << "\nНазвание: " << first->name;
-		cout << "\nСтоимость: " << first->cost << " рублей";
-		cout << "\nВес: " << first->weight << " кг";
-		cout << "\nВ наличии? " << (first->availability == 1 ? "Да" : "Нет");
+	else {
+		return first;
 	}
-	
+
 }
 
 bool push_forward(string name, int cost, bool availability, float weight) {
 
-    struct Node* temp;
-    
-    temp = new Node();
+	struct Node* temp;
+
+	temp = new Node();
 	// Запись данных
-    temp->name = name;
+	temp->name = name;
 	temp->cost = cost;
 	temp->availability = availability;
 	temp->weight = weight;
 
 
 	// Делаем верхним этот узел
-    temp->next = first;//Тот, что был верхним, окажется под ним
-    first = temp;
+	temp->next = first;//Тот, что был верхним, окажется под ним
+	first = temp;
 
 	cout << "\nМяч " << name << " стоимостью " << cost << " записан\n";
 
-    return 1;
+	return 1;
 };
 
 bool push_back(string name, int cost, bool availability, float weight) {
@@ -239,19 +328,19 @@ bool push_back(string name, int cost, bool availability, float weight) {
 	temp->next = last;
 
 	//Присваиваем последнему узлу данные
-	
+
 	temp->next->name = name;
 	temp->next->cost = cost;
 	temp->next->availability = availability;
 	temp->next->weight = weight;
 
 	cout << "\nМяч " << name << " стоимостью " << cost << " записан в конец\n";
-	
+
 	return 1;
 };
 
 void fileInsert() {
-	
+
 	ifstream fin("Stack File.txt");
 
 	string name;
@@ -259,7 +348,7 @@ void fileInsert() {
 	bool availability;
 	float weight;
 
-	while (getline(fin,name) && fin >> cost >> availability >> weight) {
+	while (fin >> name >> cost >> availability >> weight) {
 		push_forward(name, cost, availability, weight);
 	}
 
@@ -286,7 +375,7 @@ void stackFileCreation() {
 			bool availability;
 			float weight;
 
-			cout << "\nВведите поле name="; getline(cin, name);
+			cout << "\nВведите поле name="; cin >> name;
 			cout << "\nВведите поле cost="; cin >> cost;
 			cout << "\nВведите поле availability="; cin >> availability;
 			cout << "\nВведите поле weight="; cin >> weight;
@@ -297,5 +386,7 @@ void stackFileCreation() {
 
 
 	} while (exit != 1);
+
+	fout.close();
 
 }
