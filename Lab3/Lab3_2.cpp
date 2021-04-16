@@ -239,9 +239,8 @@ void sell(struct data data) {
 			if (temp->data.groupcode == data.groupcode && temp->data.name == data.name) {
 				if (temp->data.quantity >= data.quantity) {
 					temp->data.quantity -= data.quantity;
-					temp->data.solded += data.quantity;
-					total += temp->data.solded * temp->data.soldprice;
-					profit += temp->data.solded * ( temp->data.soldprice - temp->data.startprice);
+					total += data.quantity * temp->data.soldprice;
+					profit += temp->data.quantity * ( temp->data.soldprice - temp->data.startprice);
 				}
 				else {
 					cout << "\nНедостаточно товара на складе\n";
@@ -252,10 +251,10 @@ void sell(struct data data) {
 
 					if (ch == 1) {
 						
-						temp->data.solded += temp->data.quantity;
+						
+						total += temp->data.quantity * temp->data.soldprice;
+						profit += temp->data.quantity * (temp->data.soldprice - temp->data.startprice);
 						temp->data.quantity = 0;
-						total += temp->data.solded * temp->data.soldprice;
-						profit += temp->data.solded * (temp->data.soldprice - temp->data.startprice);
 						cout << "\nОстатки товара" << data.name << " проданы\n";
 					}
 
