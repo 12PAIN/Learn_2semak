@@ -36,7 +36,7 @@ char* returnSeria(struct Data);
 Data unSeria(char*);
 
 //Выстаскивает первый
-bool pop();
+bool pop(struct Data & data);
 
 //Вытаскивает все
 bool pop_all();
@@ -193,6 +193,7 @@ bool push_back(struct Data data) {
 		temp->next->seria = new_seria;
 
 
+
 		cout << "\nТовар " << data.name << " стоимостью " << data.cost << " записан!\n";
 
 
@@ -205,7 +206,7 @@ bool push_back(struct Data data) {
 
 		temp->seria = new_seria;
 
-		temp->next = first;
+		temp->next = NULL;
 		first = temp;
 		cout << "\nТовар " << data.name << " стоимостью " << data.cost << " записан!\n";
 
@@ -317,8 +318,6 @@ Data unSeria(char* seria) {
 	//И переписываем в нашу структуру
 	data.name = temp;
 	
-
-	
 	//Получаем данные из серии
 	data.cost = *reinterpret_cast<int*>(seria + n0 + n1);//<-Это смещение откуда читать данные
 	data.availability = *reinterpret_cast<bool*>(seria + n0 + n1 + n2);
@@ -360,7 +359,7 @@ void print() {
 
 };
 
-bool pop() {
+bool pop(struct Data & data) {
 
 	struct Node* temp;
 
@@ -369,8 +368,12 @@ bool pop() {
 		return 0;
 	}
 	else {
+
 		// верхнее значение помещаем в temp
 		temp = first;
+
+		//Создаём копию данных
+		data = unSeria(temp->seria);
 
 		// в вершину стека кладем следующий узел сверху
 		first = first->next;
@@ -391,8 +394,9 @@ bool pop() {
 
 bool pop_all() {
 	//Если не пустой, удаляем всё
+	struct Data data;
 	if (first != NULL) {
-		while (pop() != 0);// эта фигня вернёт потом 0 когда очередь будет пустая
+		while (pop(data) != 0);// эта фигня вернёт потом 0 когда очередь будет пустая
 		cout << "\nКорзина очищена!\n";
 	}
 	else {
@@ -440,7 +444,7 @@ void queueFileCreation() {
 		//Меню, да
 		unsigned short int ch;
 		cout << "\n\n1. Внести новый элемент";
-		cout << "0. Выход\n\n->";
+		cout << "\n0. Выход\n\n->";
 		cin >> ch;
 
 		if (ch == 0) exit = 1;// Если введём на выход цифру, то всё в шоколаде
@@ -501,18 +505,30 @@ void clearFile() {
 void finding(string index) {
 
 	//Тут вообще всё на костылях так сказать, я не знаю как по другому, но оно прекрасно работает
+	
+	//Тут я запоминаю первый типа, чтобы вечно по кругу не ходить
+	char* first_seria;
+	bool check = 0;
 
 	//Если не пустой идём убивать
 	if (first != NULL) {
+		
+		
 
 		//Тут нужно чтобы записать в них переделанную строку
 		int index_int;
 		float index_float;
 
-		//А это для движения по списку и задания отставания на 1
+		//А это для движения по списку
 		struct Node* temp;
-		struct Node* temp1;
-		temp1 = first;
+		int count = 0;
+		temp = first;
+
+		while (temp != NULL) {
+			temp = temp->next;
+			count++;
+		}
+		
 		temp = first;
 
 		//Преобразуем строку в значения 
@@ -521,14 +537,17 @@ void finding(string index) {
 
 		//Вот это 1) для того чтобы записать, вытащили ли мы вообще
 		//2) для задания отставания на 1 узел списка
-		bool once = 0, check = 0;
+		bool once = 0;
 
 		//Данные данные, грязные C++ данные
 		struct Data data;
 
-		while (temp1 != NULL && temp != NULL) {
 
-			data = unSeria(temp1->seria); // Десериализуем, получаем данные из узла
+
+		for (int i = 0; i < count; i++) {
+
+			data = unSeria(temp->seria); // Десериализуем, получаем данные из узла
+
 			if (index == data.name || index_float == data.weight || index_int == data.cost) { // Ищем совпадения
 
 				//Тут если нашлось то выведет один раз только, а не кучу раз
@@ -544,38 +563,22 @@ void finding(string index) {
 				cout << endl;
 
 				//Удаление из списка
-				if (temp1 != first) {// Если не первый, то
-					
-					//связываем через 1
-					temp->next = temp1->next;
-
-					//Очищаем
-					free(temp1);
-
-					//Присваиваем связь
-					temp1 = temp->next;
-
-				}
-				else {
-					//А тут если первый, то просто попаем, и оба указателя вперёд двигаем
-					temp1 = first->next;
-					temp = first->next;
-					pop();
-				}
+				temp = first->next;
+				
+				pop(data);
+				count--;
 
 				cout << "\nТовар удален из корзины\n"; // Вроде логично
 
 			}
 			else {
 				// А если не нашлось то ты ИдиИиИиИ вперёд по списку
-				if (temp1 != NULL && temp != NULL) {
-					if (check == 1) {
-						temp = temp->next; // Короче тут вот отставание, как только сюда попадёт в первый раз указатель, то он не запустит это
-					}
-					temp1 = temp1->next;// Тут мы двигаем всегда вперёд первый указатель
-					check = 1;// Но вот тут уже присваивается 1, и в следующий раз запустит
-					//По итогу при первом попадании сюда один будет стоять на втором элементе очереди, а другой всё ещё будет на первом
-					//Отставание нужно, чтобы мы смогли спокойно удалить из середины списка, иначе никак
+				if (temp != NULL) {
+
+					struct Data new_data;
+					pop(new_data);
+					push_back(new_data);
+
 				}
 
 			}
@@ -596,8 +599,5 @@ void finding(string index) {
 		cout << "\nКорзина пуста\n";
 
 	}
-
-
-
 
 }
