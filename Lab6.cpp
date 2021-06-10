@@ -32,6 +32,7 @@ void menu();
 void deleteTree(Node*&);
 void fileWrite(Node*&, ofstream&);
 void fileRead(ifstream&);
+void printTree(Node*& T);
 
 int main()
 {
@@ -53,6 +54,7 @@ void menu() {
         cout << "4. Print by first char of name\n";
         cout << "5. Add new element\n";
         cout << "6. Delete tree\n";
+        cout << "7. Print\n";
         cout << "0. Exit\n";
         cout << "-1. Read from file\n";
         cout << "-2. Write current tree to file\n";
@@ -69,6 +71,7 @@ void menu() {
             sort_str(root);
 
             root = temp;
+            temp = NULL;
 
             break;
         }
@@ -78,6 +81,7 @@ void menu() {
             sort(root);
 
             root = temp;
+            temp = NULL;
 
             break;
         }
@@ -132,6 +136,19 @@ void menu() {
         case 6: {
 
             deleteTree(root);
+
+            break;
+        }
+
+
+        case 7: {
+
+            system("cls");
+
+            printTree(root);
+
+            system("pause");
+            system("cls");
 
             break;
         }
@@ -284,6 +301,20 @@ void push_str(Node*& T, struct Data data) {
         push_str(T->right, data);
     }
 
+}
+
+void printTree(Node*& T) {
+    if (!T) return;
+
+    printTree(T->left);
+
+    cout << "\nName: " << T->data.name;
+    cout << "\nCost: " << T->data.cost << "$";
+    cout << "\nQuantity: " << T->data.quantity;
+    cout << "\nAvailability: " << (T->data.availability == 1 ? "Yes" : "No");
+    cout << endl;
+    
+    printTree(T->right);
 }
 
 void printTree_value(Node*& T, int value) {
